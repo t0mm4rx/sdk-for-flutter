@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+// import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'client_mixin.dart';
 import 'client_base.dart';
 import 'cookie_manager.dart';
@@ -28,7 +28,7 @@ ClientBase createClient({
     );
 
 class ClientIO extends ClientBase with ClientMixin {
-  static const int CHUNK_SIZE = 5*1024*1024;
+  static const int CHUNK_SIZE = 5 * 1024 * 1024;
   String _endPoint;
   Map<String, String>? _headers;
   @override
@@ -53,25 +53,21 @@ class ClientIO extends ClientBase with ClientMixin {
     this.selfSigned = false,
   }) : _endPoint = endPoint {
     _nativeClient = HttpClient()
-      ..badCertificateCallback =
-          ((X509Certificate cert, String host, int port) => selfSigned);
+      ..badCertificateCallback = ((X509Certificate cert, String host, int port) => selfSigned);
     _httpClient = IOClient(_nativeClient);
-    _endPointRealtime = endPoint
-        .replaceFirst('https://', 'wss://')
-        .replaceFirst('http://', 'ws://');
+    _endPointRealtime = endPoint.replaceFirst('https://', 'wss://').replaceFirst('http://', 'ws://');
     _headers = {
       'content-type': 'application/json',
       'x-sdk-name': 'Flutter',
       'x-sdk-platform': 'client',
       'x-sdk-language': 'flutter',
       'x-sdk-version': '11.0.1',
-      'X-Appwrite-Response-Format' : '1.4.0',
+      'X-Appwrite-Response-Format': '1.4.0',
     };
 
     config = {};
 
-    assert(_endPoint.startsWith(RegExp("http://|https://")),
-        "endPoint $_endPoint must start with 'http'");
+    assert(_endPoint.startsWith(RegExp("http://|https://")), "endPoint $_endPoint must start with 'http'");
     init();
   }
 
@@ -86,41 +82,40 @@ class ClientIO extends ClientBase with ClientMixin {
     return dir;
   }
 
-     /// Your project ID
-    @override
-    ClientIO setProject(value) {
-        config['project'] = value;
-        addHeader('X-Appwrite-Project', value);
-        return this;
-    }
-     /// Your secret JSON Web Token
-    @override
-    ClientIO setJWT(value) {
-        config['jWT'] = value;
-        addHeader('X-Appwrite-JWT', value);
-        return this;
-    }
-    @override
-    ClientIO setLocale(value) {
-        config['locale'] = value;
-        addHeader('X-Appwrite-Locale', value);
-        return this;
-    }
+  /// Your project ID
+  @override
+  ClientIO setProject(value) {
+    config['project'] = value;
+    addHeader('X-Appwrite-Project', value);
+    return this;
+  }
+
+  /// Your secret JSON Web Token
+  @override
+  ClientIO setJWT(value) {
+    config['jWT'] = value;
+    addHeader('X-Appwrite-JWT', value);
+    return this;
+  }
+
+  @override
+  ClientIO setLocale(value) {
+    config['locale'] = value;
+    addHeader('X-Appwrite-Locale', value);
+    return this;
+  }
 
   @override
   ClientIO setSelfSigned({bool status = true}) {
     selfSigned = status;
-    _nativeClient.badCertificateCallback =
-        ((X509Certificate cert, String host, int port) => status);
+    _nativeClient.badCertificateCallback = ((X509Certificate cert, String host, int port) => status);
     return this;
   }
 
   @override
   ClientIO setEndpoint(String endPoint) {
     _endPoint = endPoint;
-    _endPointRealtime = endPoint
-        .replaceFirst('https://', 'wss://')
-        .replaceFirst('http://', 'ws://');
+    _endPointRealtime = endPoint.replaceFirst('https://', 'wss://').replaceFirst('http://', 'ws://');
     return this;
   }
 
@@ -138,7 +133,7 @@ class ClientIO extends ClientBase with ClientMixin {
   }
 
   Future init() async {
-    if(_initProgress) return;
+    if (_initProgress) return;
     _initProgress = true;
     final Directory cookieDir = await _getCookiePath();
     _cookieJar = PersistCookieJar(storage: FileStorage(cookieDir.path));
@@ -147,15 +142,13 @@ class ClientIO extends ClientBase with ClientMixin {
     var device = '';
     try {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      addHeader('Origin',
-          'appwrite-${Platform.operatingSystem}://${packageInfo.packageName}');
+      addHeader('Origin', 'appwrite-${Platform.operatingSystem}://${packageInfo.packageName}');
 
       //creating custom user agent
       DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
       if (Platform.isAndroid) {
         final andinfo = await deviceInfoPlugin.androidInfo;
-        device =
-            '(Linux; U; Android ${andinfo.version.release}; ${andinfo.brand} ${andinfo.model})';
+        device = '(Linux; U; Android ${andinfo.version.release}; ${andinfo.brand} ${andinfo.model})';
       }
       if (Platform.isIOS) {
         final iosinfo = await deviceInfoPlugin.iosInfo;
@@ -167,20 +160,17 @@ class ClientIO extends ClientBase with ClientMixin {
       }
       if (Platform.isWindows) {
         final wininfo = await deviceInfoPlugin.windowsInfo;
-        device =
-            '(Windows NT; ${wininfo.computerName})'; //can't seem to get much info here
+        device = '(Windows NT; ${wininfo.computerName})'; //can't seem to get much info here
       }
       if (Platform.isMacOS) {
         final macinfo = await deviceInfoPlugin.macOsInfo;
         device = '(Macintosh; ${macinfo.model})';
       }
-      addHeader(
-          'user-agent', '${packageInfo.packageName}/${packageInfo.version} $device');
+      addHeader('user-agent', '${packageInfo.packageName}/${packageInfo.version} $device');
     } catch (e) {
       debugPrint('Error getting device info: $e');
       device = Platform.operatingSystem;
-      addHeader(
-          'user-agent', '$device');
+      addHeader('user-agent', '$device');
     }
 
     _initialized = true;
@@ -245,12 +235,9 @@ class ClientIO extends ClientBase with ClientMixin {
     late Response res;
     if (size <= CHUNK_SIZE) {
       if (file.path != null) {
-        params[paramName] = await http.MultipartFile.fromPath(
-            paramName, file.path!,
-            filename: file.filename);
+        params[paramName] = await http.MultipartFile.fromPath(paramName, file.path!, filename: file.filename);
       } else {
-        params[paramName] = http.MultipartFile.fromBytes(paramName, file.bytes!,
-            filename: file.filename);
+        params[paramName] = http.MultipartFile.fromBytes(paramName, file.bytes!, filename: file.filename);
       }
       return call(
         HttpMethod.post,
@@ -289,12 +276,9 @@ class ClientIO extends ClientBase with ClientMixin {
         raf!.setPositionSync(offset);
         chunk = raf.readSync(CHUNK_SIZE);
       }
-      params[paramName] =
-          http.MultipartFile.fromBytes(paramName, chunk, filename: file.filename);
-      headers['content-range'] =
-          'bytes $offset-${min<int>((offset + CHUNK_SIZE - 1), size - 1)}/$size';
-      res = await call(HttpMethod.post,
-          path: path, headers: headers, params: params);
+      params[paramName] = http.MultipartFile.fromBytes(paramName, chunk, filename: file.filename);
+      headers['content-range'] = 'bytes $offset-${min<int>((offset + CHUNK_SIZE - 1), size - 1)}/$size';
+      res = await call(HttpMethod.post, path: path, headers: headers, params: params);
       offset += CHUNK_SIZE;
       if (offset < size) {
         headers['x-appwrite-id'] = res.data['\$id'];
@@ -316,28 +300,28 @@ class ClientIO extends ClientBase with ClientMixin {
 
   @override
   Future webAuth(Uri url, {String? callbackUrlScheme}) {
-    return FlutterWebAuth2.authenticate(
-      url: url.toString(),
-      callbackUrlScheme: callbackUrlScheme != null && _customSchemeAllowed
-          ? callbackUrlScheme
-          : "appwrite-callback-" + config['project']!,
-      preferEphemeral: true,
-    ).then((value) async {
-      Uri url = Uri.parse(value);
-      final key = url.queryParameters['key'];
-      final secret = url.queryParameters['secret'];
-      if (key == null || secret == null) {
-        throw AppwriteException(
-            "Invalid OAuth2 Response. Key and Secret not available.", 500);
-      }
-      Cookie cookie = Cookie(key, secret);
-      cookie.domain = Uri.parse(_endPoint).host;
-      cookie.httpOnly = true;
-      cookie.path = '/';
-      List<Cookie> cookies = [cookie];
-      await init();
-      _cookieJar.saveFromResponse(Uri.parse(_endPoint), cookies);
-    });
+    // return FlutterWebAuth2.authenticate(
+    //   url: url.toString(),
+    //   callbackUrlScheme: callbackUrlScheme != null && _customSchemeAllowed
+    //       ? callbackUrlScheme
+    //       : "appwrite-callback-" + config['project']!,
+    //   preferEphemeral: true,
+    // ).then((value) async {
+    //   Uri url = Uri.parse(value);
+    //   final key = url.queryParameters['key'];
+    //   final secret = url.queryParameters['secret'];
+    //   if (key == null || secret == null) {
+    //     throw AppwriteException("Invalid OAuth2 Response. Key and Secret not available.", 500);
+    //   }
+    //   Cookie cookie = Cookie(key, secret);
+    //   cookie.domain = Uri.parse(_endPoint).host;
+    //   cookie.httpOnly = true;
+    //   cookie.path = '/';
+    //   List<Cookie> cookies = [cookie];
+    //   await init();
+    //   _cookieJar.saveFromResponse(Uri.parse(_endPoint), cookies);
+    // });
+    throw new Error();
   }
 
   @override

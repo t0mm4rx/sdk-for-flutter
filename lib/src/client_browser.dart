@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+// import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/browser_client.dart';
 import 'package:universal_html/html.dart' as html;
@@ -19,7 +19,7 @@ ClientBase createClient({
     ClientBrowser(endPoint: endPoint, selfSigned: selfSigned);
 
 class ClientBrowser extends ClientBase with ClientMixin {
-  static const int CHUNK_SIZE = 5*1024*1024;
+  static const int CHUNK_SIZE = 5 * 1024 * 1024;
   String _endPoint;
   Map<String, String>? _headers;
   @override
@@ -35,9 +35,7 @@ class ClientBrowser extends ClientBase with ClientMixin {
     bool selfSigned = false,
   }) : _endPoint = endPoint {
     _httpClient = BrowserClient();
-    _endPointRealtime = endPoint
-        .replaceFirst('https://', 'wss://')
-        .replaceFirst('http://', 'ws://');
+    _endPointRealtime = endPoint.replaceFirst('https://', 'wss://').replaceFirst('http://', 'ws://');
     _headers = {
       'content-type': 'application/json',
       'x-sdk-name': 'Flutter',
@@ -49,8 +47,7 @@ class ClientBrowser extends ClientBase with ClientMixin {
 
     config = {};
 
-    assert(_endPoint.startsWith(RegExp("http://|https://")),
-        "endPoint $_endPoint must start with 'http'");
+    assert(_endPoint.startsWith(RegExp("http://|https://")), "endPoint $_endPoint must start with 'http'");
     init();
   }
 
@@ -64,6 +61,7 @@ class ClientBrowser extends ClientBase with ClientMixin {
     addHeader('X-Appwrite-Project', value);
     return this;
   }
+
   /// Your secret JSON Web Token
   @override
   ClientBrowser setJWT(value) {
@@ -71,6 +69,7 @@ class ClientBrowser extends ClientBase with ClientMixin {
     addHeader('X-Appwrite-JWT', value);
     return this;
   }
+
   @override
   ClientBrowser setLocale(value) {
     config['locale'] = value;
@@ -86,9 +85,7 @@ class ClientBrowser extends ClientBase with ClientMixin {
   @override
   ClientBrowser setEndpoint(String endPoint) {
     _endPoint = endPoint;
-    _endPointRealtime = endPoint
-        .replaceFirst('https://', 'wss://')
-        .replaceFirst('http://', 'ws://');
+    _endPointRealtime = endPoint.replaceFirst('https://', 'wss://').replaceFirst('http://', 'ws://');
     return this;
   }
 
@@ -107,8 +104,7 @@ class ClientBrowser extends ClientBase with ClientMixin {
 
   Future init() async {
     if (html.window.localStorage.keys.contains('cookieFallback')) {
-      addHeader('x-fallback-cookies',
-          html.window.localStorage['cookieFallback'] ?? '');
+      addHeader('x-fallback-cookies', html.window.localStorage['cookieFallback'] ?? '');
     }
     _httpClient.withCredentials = true;
   }
@@ -158,12 +154,9 @@ class ClientBrowser extends ClientBase with ClientMixin {
       var chunk;
       final end = min(offset + CHUNK_SIZE, size);
       chunk = file.bytes!.getRange(offset, end).toList();
-      params[paramName] =
-          http.MultipartFile.fromBytes(paramName, chunk, filename: file.filename);
-      headers['content-range'] =
-          'bytes $offset-${min<int>((offset + CHUNK_SIZE - 1), size - 1)}/$size';
-      res = await call(HttpMethod.post,
-          path: path, headers: headers, params: params);
+      params[paramName] = http.MultipartFile.fromBytes(paramName, chunk, filename: file.filename);
+      headers['content-range'] = 'bytes $offset-${min<int>((offset + CHUNK_SIZE - 1), size - 1)}/$size';
+      res = await call(HttpMethod.post, path: path, headers: headers, params: params);
       offset += CHUNK_SIZE;
       if (offset < size) {
         headers['x-appwrite-id'] = res.data['\$id'];
@@ -219,9 +212,10 @@ class ClientBrowser extends ClientBase with ClientMixin {
 
   @override
   Future webAuth(Uri url, {String? callbackUrlScheme}) {
-  return FlutterWebAuth2.authenticate(
-      url: url.toString(),
-      callbackUrlScheme: "appwrite-callback-" + config['project']!,
-    );
+    // return FlutterWebAuth2.authenticate(
+    //     url: url.toString(),
+    //     callbackUrlScheme: "appwrite-callback-" + config['project']!,
+    //   );
+    throw new Error();
   }
 }

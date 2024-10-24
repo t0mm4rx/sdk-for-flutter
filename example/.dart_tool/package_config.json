@@ -1,0 +1,17 @@
+{
+  "configVersion": 2,
+  "packages": [
+    {
+      "name": "appwrite_example",
+      "rootUri": "../",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    }
+  ],
+  "generated": "2024-10-24T14:33:35.226768Z",
+  "generator": "pub",
+  "generatorVersion": "3.5.3",
+  "flutterRoot": "file:///Users/tom/Documents/flutter",
+  "flutterVersion": "3.24.3",
+  "pubCache": "file:///Users/tom/.pub-cache"
+}
